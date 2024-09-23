@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.App.NoActionBar" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/weather_background_color</item>
+        <item name="android:windowBackground">@color/weather_background_color</item>
+        <item name="android:windowLightStatusBar">true</item> <!-- 아이콘과 텍스트를 어둡게 설정 -->
+
+    </style>
+
+
+</resources>

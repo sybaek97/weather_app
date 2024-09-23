@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="weather_background_color">#57A1E7</color>
+    <color name="weather_sub_background_color">#5095D1</color>
+    <color name="weather_darkgray">#3C70A0</color>
+
+</resources>
