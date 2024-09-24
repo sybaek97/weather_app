@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.crepass.weather.item.ChildItem;
 import com.crepass.weather.R;
+import com.crepass.weather.common.WeatherHelper;
 
 import java.util.List;
 
@@ -32,10 +33,18 @@ public class ChildWeatherAdapter extends RecyclerView.Adapter<ChildWeatherAdapte
     @Override
     public void onBindViewHolder(@NonNull ChildViewHolder holder, int position) {
         ChildItem item = childItems.get(position);
-        holder.txtTime.setText(item.getTime());
-        holder.txtTemperature.setText(item.getTemperature());
-        holder.txtRainPercent.setText(item.getRainPercent());
-        holder.imgIcon.setImageResource(item.getIconRes());
+        holder.txtTime.setText(WeatherHelper.formatTime(item.getTime()));
+        holder.txtTemperature.setText(item.getTemperature()+"°C");
+        holder.txtRainPercent.setText(item.getRainPercent()+"%");
+
+        if(item.getIconRes()==1){
+            holder.imgIcon.setImageResource(R.drawable.sun);
+
+
+        }else if(item.getIconRes()==2){
+            holder.imgIcon.setImageResource(R.drawable.rain);
+
+        }
     }
 
     @Override

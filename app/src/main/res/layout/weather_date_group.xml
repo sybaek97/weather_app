@@ -123,11 +123,11 @@
             android:orientation="vertical"
             android:layout_height="match_parent">
 
-            <androidx.appcompat.widget.AppCompatImageButton
+            <ImageView
                 android:id="@+id/btn_expand"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:background="@drawable/arrow_down"
+                android:src="@drawable/arrow_down"
                 />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

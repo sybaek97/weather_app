@@ -7,6 +7,10 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import android.os.Handler;
+import android.os.Looper;
 
 public class WeatherRepository {
 
@@ -14,6 +18,8 @@ public class WeatherRepository {
     private static final String SERVICE_KEY = ""; // 공공데이터 포털에서 발급받은 API 키를 입력하세요.
 
     private WeatherApiService apiService;
+    private final ExecutorService executorService;
+    private final Handler mainHandler;
 
     public WeatherRepository() {
         HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
@@ -28,25 +34,25 @@ public class WeatherRepository {
                 .build();
 
         apiService = retrofit.create(WeatherApiService.class);
+
+        // ExecutorService와 Handler 초기화
+        executorService = Executors.newFixedThreadPool(4); // 4개의 스레드 풀 생성
+        mainHandler = new Handler(Looper.getMainLooper()); // UI 스레드 핸들러 생성
     }
 
     public void getWeather(String baseDate, String baseTime, String nx, String ny,int numOfRows, final WeatherCallback callback) {
-        Call<WeatherResponse> call = apiService.getWeather(SERVICE_KEY, numOfRows, 1, "JSON", baseDate, baseTime, nx, ny);
+        executorService.execute(() -> {
+            try {
+                Call<WeatherResponse> call = apiService.getWeather(SERVICE_KEY, numOfRows, 1, "JSON", baseDate, baseTime, nx, ny);
+                Response<WeatherResponse> response = call.execute(); // 동기 호출로 변경
 
-
-        call.enqueue(new Callback<WeatherResponse>() {
-            @Override
-            public void onResponse(Call<WeatherResponse> call, Response<WeatherResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    callback.onSuccess(response.body());
+                    mainHandler.post(() -> callback.onSuccess(response.body()));
                 } else {
-                    callback.onFailure("API 응답 실패: " + response.message());
+                    mainHandler.post(() -> callback.onFailure("API 응답 실패: " + response.message()));
                 }
-            }
-
-            @Override
-            public void onFailure(Call<WeatherResponse> call, Throwable t) {
-                callback.onFailure("API 호출 실패: " + t.getMessage());
+            } catch (Exception e) {
+                mainHandler.post(() -> callback.onFailure("API 호출 실패: " + e.getMessage()));
             }
         });
     }

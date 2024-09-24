@@ -40,7 +40,7 @@ android {
 dependencies {
     // OkHttp 라이브러리
     implementation libs.okhttp
-
+    implementation 'com.google.android.gms:play-services-location:21.0.1'
     // OkHttp 로깅 인터셉터 (로그를 출력하기 위해 필요)
     implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
 

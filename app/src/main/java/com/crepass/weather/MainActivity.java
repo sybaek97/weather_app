@@ -1,14 +1,20 @@
 package com.crepass.weather;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.crepass.weather.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int LOCATION_PERMISSION_REQUEST_CODE = 1001; // 위치 권한 요청 코드
 
     private ActivityMainBinding binding;
 
@@ -24,12 +30,45 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, WeatherActivity.class);
-                startActivity(intent);
+                if (ContextCompat.checkSelfPermission(MainActivity.this,android.Manifest.permission.ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    // 권한이 허용된 경우 WeatherActivity로 이동
+                    startWeatherActivity();
+                } else {
+                    // 권한이 허용되지 않은 경우 권한 요청
+                    requestLocationPermission();
+                }
 
             }
         });
 
     }
+    private void requestLocationPermission() {
+        ActivityCompat.requestPermissions(
+                this,
+                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                LOCATION_PERMISSION_REQUEST_CODE
+        );
+    }
 
+    // 권한 요청 결과 처리
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // 권한이 허용된 경우 WeatherActivity로 이동
+                startWeatherActivity();
+            } else {
+                // 권한이 거부된 경우 토스트 메시지 출력 및 액티비티 종료
+                Toast.makeText(this, "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    // WeatherActivity로 이동하는 메서드
+    private void startWeatherActivity() {
+        Intent intent = new Intent(MainActivity.this, WeatherActivity.class);
+        startActivity(intent);
+    }
 }

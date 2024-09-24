@@ -29,7 +29,8 @@ public class WeatherResponse {
 
         @SerializedName("fcstValue")
         public String fcstValue;
-
+        @SerializedName("POP")
+        public String pop;
         @SerializedName("fcstTime")
         public String fcstTime;
         @SerializedName("fcstDate")
