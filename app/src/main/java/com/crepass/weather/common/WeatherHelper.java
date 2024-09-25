@@ -1,5 +1,7 @@
 package com.crepass.weather.common;
 
+import android.util.Log;
+
 import com.crepass.weather.retrofit.WeatherRepository;
 
 import java.text.SimpleDateFormat;
@@ -19,7 +21,9 @@ public class WeatherHelper {
     public static String getCurrentDate() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
         Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+//        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int hour = 1;
+        Log.d("hour", String.valueOf(hour));
         int minute = calendar.get(Calendar.MINUTE);
 
         // Base Time 계산
@@ -56,7 +60,8 @@ public class WeatherHelper {
     public static String getBaseTime() {
         // 현재 시간 가져오기
         Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+//        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int hour = 1;
         int minute = calendar.get(Calendar.MINUTE);
 
         // Base Time 계산

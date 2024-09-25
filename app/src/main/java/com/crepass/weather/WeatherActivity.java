@@ -83,33 +83,7 @@ public class WeatherActivity extends AppCompatActivity implements LocationHandle
     private void updateLocationAndWeather() {
         Toast.makeText(this, "정보를 불러오고 있습니다...", Toast.LENGTH_SHORT).show();
         fusedLocationClient.getLastLocation()
-                .addOnSuccessListener(this, location -> {
-                    if (location != null) {
-                        // 현재 위치 좌표 가져오기
-                        double latitude = location.getLatitude();
-                        double longitude = location.getLongitude();
-                        CoordinateConverter.GridCoordinate grid = CoordinateConverter.convert(latitude, longitude);
-                        String nx = String.valueOf(grid.nx);
-                        String ny = String.valueOf(grid.ny);
-
-                        // 지역 이름 표시
-                        displayLocationName(latitude, longitude);
-
-                        // 날씨 데이터 요청
-                        String baseDate = getCurrentDate();  // 현재 날짜
-                        String baseTime = getBaseTime();     // 발표 시간
-                        fetchWeatherData(baseDate, baseTime, nx, ny); // 현재 위치의 좌표로 날씨 데이터 요청
-
-                        String baseMinMaxTime = "2300";
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.add(Calendar.DAY_OF_YEAR, -1);
-                        String baseMinMaxDate = dateFormat.format(calendar.getTime());
-                        fetchMinMaxWeatherData(baseMinMaxDate, baseMinMaxTime, nx, ny);
-                    } else {
-                        txtTemperature.setText("위치를 가져올 수 없습니다.");
-                    }
-                })
+                .addOnSuccessListener(this, this::handleLocationUpdate) // 콜백 함수로 연결
                 .addOnFailureListener(e -> {
                     txtTemperature.setText("위치 정보 업데이트 실패");
                     Log.e("WeatherActivity", "위치 정보 업데이트 실패: " + e.getMessage());
@@ -138,31 +112,7 @@ public class WeatherActivity extends AppCompatActivity implements LocationHandle
     // 위치 콜백 메서드 구현 (현재 위치 좌표 전달)
     @Override
     public void onLocationReceived(Location location) {
-        if (location != null) {
-
-            double latitude = location.getLatitude();
-            double longitude = location.getLongitude();
-            // 위도/경도를 격자 좌표로 변환
-            CoordinateConverter.GridCoordinate grid = CoordinateConverter.convert(latitude, longitude);
-            String nx = String.valueOf(grid.nx);
-            String ny = String.valueOf(grid.ny);
-
-            displayLocationName(latitude, longitude);
-
-            // 날씨 데이터 요청
-            String baseDate = getCurrentDate();  // 현재 날짜
-            String baseTime = getBaseTime();     // 발표 시간
-            fetchWeatherData(baseDate, baseTime, nx, ny); // 현재 위치의 좌표로 날씨 데이터 요청
-
-            String baseMinMaxTime = "2300";
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
-            Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.DAY_OF_YEAR, -1);
-            String baseMinMaxDate = dateFormat.format(calendar.getTime());
-            fetchMinMaxWeatherData(baseMinMaxDate, baseMinMaxTime, nx, ny); // 현재 위치의 좌표로 날씨 데이터 요청
-        } else {
-            txtTemperature.setText("위치를 가져올 수 없습니다.");
-        }
+        handleLocationUpdate(location);
     }
 
     private void displayLocationName(double latitude, double longitude) {
@@ -401,4 +351,32 @@ public class WeatherActivity extends AppCompatActivity implements LocationHandle
         }
     }
 
+    private void handleLocationUpdate(Location location) {
+        if (location != null) {
+            // 현재 위치 좌표 가져오기
+            double latitude = location.getLatitude();
+            double longitude = location.getLongitude();
+            CoordinateConverter.GridCoordinate grid = CoordinateConverter.convert(latitude, longitude);
+            String nx = String.valueOf(grid.nx);
+            String ny = String.valueOf(grid.ny);
+
+            // 지역 이름 표시
+            displayLocationName(latitude, longitude);
+
+            // 날씨 데이터 요청
+            String baseDate = getCurrentDate();  // 현재 날짜
+            String baseTime = getBaseTime();     // 발표 시간
+            fetchWeatherData(baseDate, baseTime, nx, ny); // 현재 위치의 좌표로 날씨 데이터 요청
+
+            String baseMinMaxTime = "2300";
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.DAY_OF_YEAR, -1);
+            String baseMinMaxDate = dateFormat.format(calendar.getTime());
+            fetchMinMaxWeatherData(baseMinMaxDate, baseMinMaxTime, nx, ny);
+        } else {
+            txtTemperature.setText("위치를 가져올 수 없습니다.");
+        }
+    }
 }
+

@@ -57,10 +57,8 @@ public class MainActivity extends AppCompatActivity {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // 권한이 허용된 경우 WeatherActivity로 이동
                 startWeatherActivity();
             } else {
-                // 권한이 거부된 경우 토스트 메시지 출력 및 액티비티 종료
                 Toast.makeText(this, "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show();
             }
         }
