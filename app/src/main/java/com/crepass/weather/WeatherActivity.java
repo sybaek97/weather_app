@@ -121,15 +121,23 @@ public class WeatherActivity extends AppCompatActivity implements LocationHandle
             List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
             if (addresses != null && !addresses.isEmpty()) {
                 Address address = addresses.get(0);
-                String district = address.getSubLocality();
 
-                if (district == null) {
-                    district = address.getLocality();
-                }
+                String thoroughfare = address.getThoroughfare(); // 도로명
+                String subThoroughfare = address.getSubThoroughfare(); // 건물 번호
+                String subLocality = address.getSubLocality(); // 구, 동
+                String feature = address.getFeatureName();
+                String locality = address.getLocality(); // 시
 
+                // 나라와 도시 제외한 주소 생성
+                StringBuilder filteredAddress = new StringBuilder();
+                if (subLocality != null) filteredAddress.append(subLocality).append(" ");
+                if (thoroughfare != null) filteredAddress.append(thoroughfare).append(" ");
+                if (feature != null) filteredAddress.append(feature);
+//                if (subThoroughfare != null) filteredAddresss.append(subThoroughfare);
 
-                Log.d("TAg", String.valueOf(address));
-                String locationName = district;
+                String locationName = filteredAddress.toString().trim();
+
+                Log.d("TAG", String.valueOf(address));
                 binding.txtRegion.setText(locationName);
             } else {
                 binding.txtRegion.setText("주소를 찾을 수 없습니다.");
@@ -155,7 +163,7 @@ public class WeatherActivity extends AppCompatActivity implements LocationHandle
 
     // 날씨 데이터 API 호출
     private void fetchWeatherData(String baseDate, String baseTime, String nx, String ny) {
-        WeatherHelper.fetchWeatherData(baseDate, baseTime, nx, ny, 860, new WeatherRepository.WeatherCallback() {
+        WeatherHelper.fetchWeatherData(baseDate, baseTime, nx, ny, 860,this, new WeatherRepository.WeatherCallback() {
             @Override
             public void onSuccess(WeatherResponse weatherResponse) {
                 if (weatherResponse != null && weatherResponse.response != null && weatherResponse.response.body != null && weatherResponse.response.body.items != null && weatherResponse.response.body.items.itemList != null) {
@@ -178,7 +186,7 @@ public class WeatherActivity extends AppCompatActivity implements LocationHandle
 
     // 날씨 데이터 API 호출
     private void fetchMinMaxWeatherData(String baseDate, String baseTime, String nx, String ny) {
-        WeatherHelper.fetchWeatherData(baseDate, baseTime, nx, ny, 800, new WeatherRepository.WeatherCallback() {
+        WeatherHelper.fetchWeatherData(baseDate, baseTime, nx, ny, 800,this, new WeatherRepository.WeatherCallback() {
             @Override
             public void onSuccess(WeatherResponse weatherResponse) {
                 if (weatherResponse != null && weatherResponse.response != null && weatherResponse.response.body != null && weatherResponse.response.body.items != null && weatherResponse.response.body.items.itemList != null) {
@@ -366,6 +374,8 @@ public class WeatherActivity extends AppCompatActivity implements LocationHandle
             // 날씨 데이터 요청
             String baseDate = getCurrentDate();  // 현재 날짜
             String baseTime = getBaseTime();     // 발표 시간
+            Log.d("time",baseDate + baseTime);
+
             fetchWeatherData(baseDate, baseTime, nx, ny); // 현재 위치의 좌표로 날씨 데이터 요청
 
             String baseMinMaxTime = "2300";

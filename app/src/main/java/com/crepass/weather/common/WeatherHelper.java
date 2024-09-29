@@ -1,5 +1,6 @@
 package com.crepass.weather.common;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.crepass.weather.retrofit.WeatherRepository;
@@ -13,16 +14,16 @@ import java.util.Locale;
 public class WeatherHelper {
 
     // 정적 메서드로 Weather 데이터를 가져오는 함수
-    public static void fetchWeatherData(String baseDate, String baseTime, String nx, String ny, int numOfRows, WeatherRepository.WeatherCallback callback) {
-        WeatherRepository weatherRepository = new WeatherRepository();
+    public static void fetchWeatherData(String baseDate, String baseTime, String nx, String ny, int numOfRows, Context context, WeatherRepository.WeatherCallback callback) {
+        WeatherRepository weatherRepository = new WeatherRepository(context);
         weatherRepository.getWeather(baseDate, baseTime, nx, ny, numOfRows, callback);
     }
 
     public static String getCurrentDate() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
         Calendar calendar = Calendar.getInstance();
-//        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int hour = 1;
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+//        int hour = 1;
         Log.d("hour", String.valueOf(hour));
         int minute = calendar.get(Calendar.MINUTE);
 
@@ -30,7 +31,7 @@ public class WeatherHelper {
         if (minute < 10) {
             hour -= 1; // 10분 이전인 경우 이전 시간을 사용
         }
-        if (hour == 1) {
+        if (hour <= 1) {
             calendar.add(Calendar.DAY_OF_YEAR, -1);
 
         }
@@ -60,17 +61,17 @@ public class WeatherHelper {
     public static String getBaseTime() {
         // 현재 시간 가져오기
         Calendar calendar = Calendar.getInstance();
-//        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int hour = 1;
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+//        int hour = 1;
         int minute = calendar.get(Calendar.MINUTE);
-
+        Log.d("time", String.valueOf(hour));
         // Base Time 계산
         if (minute < 10) {
             hour -= 1; // 10분 이전인 경우 이전 시간을 사용
         }
 //        return "2300";
         // Base Time을 3시간 간격으로 설정
-        if (hour >= 23 || hour == 1) {
+        if (hour >= 23 || hour <= 1) {
             return "2300";
         } else if (hour >= 20) {
             return "2000";

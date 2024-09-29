@@ -30,23 +30,25 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                if (ContextCompat.checkSelfPermission(MainActivity.this,android.Manifest.permission.ACCESS_FINE_LOCATION)
-                        == PackageManager.PERMISSION_GRANTED) {
-                    // 권한이 허용된 경우 WeatherActivity로 이동
+                if (ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                                == PackageManager.PERMISSION_GRANTED) {
+                    // 권한이 하나라도 허용된 경우 WeatherActivity로 이동
                     startWeatherActivity();
                 } else {
                     // 권한이 허용되지 않은 경우 권한 요청
                     requestLocationPermission();
                 }
-
             }
         });
-
     }
+
     private void requestLocationPermission() {
+        // 두 개의 위치 권한을 모두 요청
         ActivityCompat.requestPermissions(
                 this,
-                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},
                 LOCATION_PERMISSION_REQUEST_CODE
         );
     }
@@ -56,7 +58,21 @@ public class MainActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            boolean locationPermissionGranted = false;
+
+            // 모든 권한 결과를 체크하여 위치 권한이 하나라도 허용되었는지 확인
+            for (int i = 0; i < permissions.length; i++) {
+                if (permissions[i].equals(android.Manifest.permission.ACCESS_FINE_LOCATION) ||
+                        permissions[i].equals(android.Manifest.permission.ACCESS_COARSE_LOCATION)) {
+                    if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
+                        locationPermissionGranted = true;
+                        break; // 하나의 위치 권한이라도 허용되면 더 이상 체크하지 않음
+                    }
+                }
+            }
+
+            // 위치 권한이 하나라도 허용되었으면 WeatherActivity 시작
+            if (locationPermissionGranted) {
                 startWeatherActivity();
             } else {
                 Toast.makeText(this, "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show();
